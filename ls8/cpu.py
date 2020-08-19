@@ -19,14 +19,14 @@ class CPU:
 
         # For now, we've just hardcoded a program:
         if filename:
-            with open(sys.argv[1]) as x:
+            with open(filename) as x:
                 address = 0
                 for l in x:
                     value = l.split('#')[0].strip()
                     if value == "":
                         continue
                     else:
-                        instruction = int(l, 2)
+                        instruction = int(value, 2)
                         self.ram[address] = instruction
                         address +=1
 
@@ -41,7 +41,7 @@ class CPU:
                 0b00000001, # HLT
             ]
 
-        for instruction in program:
+        for address, instruction in enumerate(program):
             self.ram[address] = instruction
             
 
@@ -90,6 +90,7 @@ class CPU:
         HLT = 0b00000001
         LDI = 0b10000010
         PRN = 0b01000111
+        MUL = 0b10100010
         running = True
 
         while running:
@@ -107,6 +108,10 @@ class CPU:
             elif ir == PRN:
                 print(self.reg[operand_a])
                 self.pc+=2
+            elif ir == MUL:
+                product = self.reg[operand_b] *= self.reg[operand_b]
+                self.reg[operand_a] = product
+                self.pc += 3
             else:
                 print(f"Unknown instruction {ir} at address {self.pc}")
                 self.pc += 1
