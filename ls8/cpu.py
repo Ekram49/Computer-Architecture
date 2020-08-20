@@ -91,6 +91,12 @@ class CPU:
         LDI = 0b10000010
         PRN = 0b01000111
         MUL = 0b10100010
+        ADD = 0b10100000
+        PUSH = 0b01000101
+        POP = 0b01000110
+        CALL = 0b01010000
+        RET = 0b00010001
+        SP = 7 
         running = True
 
         while running:
@@ -111,6 +117,19 @@ class CPU:
             elif ir == MUL:
                 product = self.reg[operand_b] *= self.reg[operand_b]
                 self.reg[operand_a] = product
+                self.pc += 3
+            elif ir == PUSH:
+                self.reg[SP] -= 1
+                self.ram_write(self.reg[operand_a], self.reg[SP])
+                self.pc += 2
+            elif ir == POP:
+                value = self.ram_read(self.reg[SP])
+                self.reg[operand_a] = value
+                self.reg[SP] += 1
+                self.pc += 2
+            elif ir == ADD:
+                add = self.reg[operand_a] + self.reg[operand_b]
+                self.reg[operand_a] = add
                 self.pc += 3
             else:
                 print(f"Unknown instruction {ir} at address {self.pc}")
