@@ -96,6 +96,8 @@ class CPU:
         POP = 0b01000110
         CALL = 0b01010000
         RET = 0b00010001
+        NOP = 0b00000000
+
         SP = 7 
         running = True
 
@@ -131,7 +133,26 @@ class CPU:
                 add = self.reg[operand_a] + self.reg[operand_b]
                 self.reg[operand_a] = add
                 self.pc += 3
+            elif ir == NOP:
+                self.pc += 1
+                continue
+            elif ir == CALL:
+                self.reg[SP] -= 1
+                self.ram_write(self.pc + 2, self.reg[SP])
+                self.pc = self.reg[operand_a]
+            elif ir == RET:
+                self.pc = self.ram[self.reg[SP]]
+                self.reg[SP] += 1
             else:
                 print(f"Unknown instruction {ir} at address {self.pc}")
                 self.pc += 1
 
+if __name__ == "__main__":
+    LS8 = CPU()
+    LS8.load()
+    for i in range(9):
+        print(LS8.ram_read(i))
+    LS8.ram_write(0, 15)
+    print("==============")
+    print(LS8.ram_read(0))
+    print("==============")
